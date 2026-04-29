@@ -1,0 +1,69 @@
+import camion.*
+import cosas.*
+describe "Cargando y descargando objetos"{
+    test "cargando a camion descargado"{
+        assert.equals(#{},camion.cosas())
+        assert.that(camion.cosas().isEmpty())
+        camion.cargar(bumblebee)
+        assert.equals(#{bumblebee}, camion.cosas())
+        camion.cargar(knightRider)
+        assert.equals(#{bumblebee,knightRider}, camion.cosas())
+        camion.descargar(bumblebee)
+        assert.equals(#{knightRider}, camion.cosas())
+        assert.throwsException({camion.cargar(knightRider)}) 
+        assert.throwsException({camion.descargar(bumblebee)})
+    }
+
+    test "tengo todos pesos pares"{
+        camion.cargar(bumblebee)
+        camion.cargar(arenaAGranel)
+        assert.that(camion.todosPar())
+        arenaAGranel.peso(51)
+        assert.notThat(camion.todosPar())
+    }
+
+    test "camion con bumbel y 50 de granel"{
+        camion.cargar(bumblebee)
+        camion.cargar(arenaAGranel)
+        camion.tengoUnaCosaQuePesa(50)
+        camion.tengoUnaCosaQuePesa(800)
+        assert.notThat(camion.tengoUnaCosaQuePesa(500))
+    }
+}
+
+describe "Excesos y no excesos"{
+
+    test "SinExceso de peso"{
+        camion.cargar(bumblebee)
+        paqueteDeLadrillos.cantidadLadrillos(300)
+        camion.cargar(paqueteDeLadrillos)
+        assert.equals(2400, camion.peso())
+        assert.notThat(camion.tieneExcesoDePeso())
+    }
+    test "Con exceso de peso"{
+        paqueteDeLadrillos.cantidadLadrillos(400)
+        camion.cargar(bumblebee)
+        camion.cargar(paqueteDeLadrillos)
+        assert.equals(2600, camion.peso())
+        assert.that(camion.tieneExcesoDePeso())
+    }
+}
+
+
+describe "Niveles de peligro"{
+    test "encontrar algo"{
+        camion.cargar(bateriaAntiaerea)
+        camion.cargar(bumblebee)
+        camion.cargar(paqueteDeLadrillos)
+        camion.cargar(residuosRadiactivos)
+        camion.cargar(knightRider)
+        assert.equals(bateriaAntiaerea,camion.cosaConPeligro(0))
+        assert.equals(bumblebee,camion.cosaConPeligro(15))
+        assert.equals(residuosRadiactivos,camion.cosaConPeligro(200))
+        assert.throwsException({camion.cosaConPeligro(30)})
+        bumblebee.modo(modoRobot)
+        assert.equals(bumblebee,camion.cosaConPeligro(30))
+        bateriaAntiaerea.estaCargado(true)
+        assert.equals(bateriaAntiaerea,camion.cosaConPeligro(100))
+    }
+}
