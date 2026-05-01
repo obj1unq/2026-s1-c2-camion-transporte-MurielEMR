@@ -55,10 +55,40 @@ object camion {
 	method cosaConPeligro(nivelPeligro){
 		return cosas.find {c=>c.nivelPeligrosidad() == nivelPeligro}
 	}
-	
-	method tengoUnaCosaConPeligroMayorA(nivelPeligro){
-		return cosas.any{c => c.nivelPeligrosidad()>nivelPeligro}
+	method  cosasQueSuperanElNivelDePeligrosidad(nivelPeligro){
+		return cosas.filter {c=>c.nivelPeligrosidad() > nivelPeligro}
+	}
+	method cosasMasPeligrosasQue(unaCosa){
+		return cosas.filter {c=>c.nivelPeligrosidad() > unaCosa.nivelPeligrosidad() }
+	}
+	method puedeCircularEnRutaConPeligroLimite(nivelPeligro){
+		return (not self.tieneExcesoDePeso()) && self.cosasQueSuperanElNivelDePeligrosidad(nivelPeligro).isEmpty()
+	}
+	//TIENE ALGO QUE PESA ENTRE DOS VALORES. TE QUEDASTE HASTA AHI, MASO LA MITAD DEL TP
+	method tieneAlgoQuePesaEntre(peso1,peso2){
+		return cosas.any({c => c.peso().between(peso1,peso2)})
+	}
+	method laCosaMasPesada(){
+		self.verificarQueHayCosas()
+		return cosas.max{cosa => cosa.peso()}
+	}
+	method verificarQueHayCosas(){
+		if (cosas.isEmpty()){
+			self.error("Tenes el camion vacio che")
+		}
+	}
+	method totalDeBultosTransportados(){
+		return cosas.sum({cosas => cosas.cantidadDeBultos()})
+	}
+	method accidente(){
+		cosas.forEach({cosa => cosa.accidente()})
 	}
 
 
+	method transportar(destino, camino){
+		camino.verificarCamino()
+		destino.almacenar()
+		cosas.clear()
+	}
 }
+	
